@@ -1,0 +1,163 @@
+(*
+# Modify
+  - add Program
+  - modify CompUnit
+
+# Some Analysis
+  - First_1th(ConstDecl) = { "const" }
+  - First_1th(VarDecl) = { "int" }
+  - First_1th(FuncDef) = { "void", "int" }
+  - First_2th(VarDecl) = { IDENT }
+  - First_2th(FuncDef) = { IDENT }
+  - First_3th(VarDecl) = { ",", ";", "[", "=" }
+  - First_3th(FuncDef) = { "(" }
+
+  > peak 3th token for VarDecl/FuncDef
+
+  - for InitVal, "{" not in First_1th(Exp)
+  - for ConstInitVal, "{" not in First_1th(ConstExp)
+
+*)
+
+Program       ::= {CompUnit};
+CompUnit      ::= Decl | FuncDef;
+Decl          ::= ConstDecl | VarDecl;
+BType         ::= "int";
+
+ConstDecl     ::= "const" BType ConstDef {"," ConstDef} ";";
+ConstDef      ::= IDENT {"[" ConstExp "]"} "=" ConstInitVal;
+ConstInitVal  ::= ConstExp | "{" [ConstInitVal {"," ConstInitVal}] "}";
+
+VarDecl       ::= BType VarDef {"," VarDef} ";";
+VarDef        ::= IDENT {"[" ConstExp "]"}
+                | IDENT {"[" ConstExp "]"} "=" InitVal;
+InitVal       ::= Exp | "{" [InitVal {"," InitVal}] "}";
+
+FuncDef       ::= FuncType IDENT "(" [FuncFParams] ")" Block;
+FuncType      ::= "void" | "int";
+FuncFParams   ::= FuncFParam {"," FuncFParam};
+FuncFParam    ::= BType IDENT ["[" "]" {"[" ConstExp "]"}];
+
+(*
+# Some Analysis
+  - First_1th(Decl) = { "const", "int" }
+  - First_1th(Stmt) = { IDENT, ";", "{", "if", ... } + First(Exp)
+
+*)
+
+Block         ::= "{" {BlockItem} "}";
+BlockItem     ::= Decl | Stmt;
+
+(*
+# Modify:
+  - subdivide Stmt
+
+# Some Analysis
+  - First_1th(LVal) = { IDENT }
+  - First_1th(Exp)  = First_1th(UnaryExp)
+                    = { IDENT, INT_CONST, "(", "+", "-", "!" }
+
+LVal          ::= IDENT {"[" Exp "]"};
+PrimaryExp    ::= "(" Exp ")" | LVal | Number;
+Number        ::= INT_CONST;
+UnaryExp      ::= PrimaryExp | FuncCall | UnaryOp UnaryExp;
+FuncCall      ::= IDENT "(" [FuncRParams] ")";
+
+
+Stmt          ::= LVal "=" Exp ";"
+                | [Exp] ";"
+                | Block
+                | "if" "(" Cond ")" Stmt ["else" Stmt]
+                | "while" "(" Cond ")" Stmt
+                | "break" ";"
+                | "continue" ";"
+                | "return" [Exp] ";";
+
+*)
+
+Stmt          ::= AssignStmt | BareStmt | Block | IfElseStmt
+                | WhileStmt | ControlStmt;
+AssignStmt    ::= LVal "=" Exp ";";
+BareStmt      ::= [Exp] ";";
+IfElseStmt    ::= "if" "(" Cond ")" Stmt ["else" Stmt];
+WhileStmt     ::= "while" "(" Cond ")" Stmt;
+ControlStmt   ::= "break" ";"
+                | "continue" ";"
+                | "return" [Exp] ";";
+
+(*
+# Modify:
+  - add FuncCall
+
+# Some Analysis
+  - Exp = ConstExp = AddExp
+
+  - First_1th(Exp)  = First_1th(ConstExp)
+  - First_1th(Exp)  = First_1th(AddExp)
+                    = First_1th(MulExp)
+                    = First_1th(UnaryExp)
+
+  - First_1th(Cond) = First_1th(LOrExp)
+                    = First_1th(LAndExp)
+                    = First_1th(EqExp)
+                    = First_1th(RelExp)
+                    = First_1th(AddExp)
+                    = ...
+
+  - First_1th(UnaryOp) = { "+", "-", "!" }
+  - First_1th(PrimaryExp) = { "(", IDENT, INT_CONST }
+  - First_1th(FuncCall) = { IDENT }
+  - First_2th(PrimaryExp) = First_1th(Exp) + { "[" }
+  - First_2th(FuncCall) = { "(" }
+
+  > but if PrimaryExp => LVal, 2th token must be "["
+  > so peek 2th token for PrimaryExp/FuncCall
+
+  - First_1th(MulExp) = First_1th(UnaryExp)
+  - First_1th(AddExp) = First_1th(MulExp) = First_1th(UnaryExp)
+  - First_1th(RelExp) = First_1th(AddExp) = First_1th(UnaryExp)
+  - FIrst_1th(EqExp) = First_1th(RelExp) = First_1th(UnaryExp)
+  - First_1th(LAndExp) = First_1th(EqExp) = First_1th(UnaryExp)
+  - First_1th(LOrExp) = First_1th(LAndExp) = First_1th(UnaryExp)
+  - First_1th(Cond) = First_1th(LOrExp) = First_1th(UnaryExp)
+  - First_1th(Exp) = First_1th(AddExp) = First_1th(UnaryExp)
+
+  - LOrExp = LAndExp op LAndExp op LAndExp op ......
+  - LAndExp = EqExp op EqExp op EqExp op ......
+  - EqExp = RelExp op RelExp op RelExp op ......
+  - RelExp = AddExp op AddExp op AddExp op ......
+  - AddExp = MulExp op MulExp op MulExp op ......
+  - MulExp = UnaryExp op UnaryExp op UnaryExp op ......
+
+*)
+
+Exp           ::= AddExp;
+Cond          ::= LOrExp;
+ConstExp      ::= AddExp;
+LVal          ::= IDENT {"[" Exp "]"};
+PrimaryExp    ::= "(" Exp ")" | LVal | Number;
+Number        ::= INT_CONST;
+UnaryExp      ::= PrimaryExp | FuncCall | UnaryOp UnaryExp;
+UnaryOp       ::= "+" | "-" | "!";
+FuncCall      ::= IDENT "(" [FuncRParams] ")";
+FuncRParams   ::= Exp {"," Exp};
+
+(*
+# Modify:
+  - remove left recursion
+
+MulExp        ::= UnaryExp | MulExp ("*" | "/" | "%") UnaryExp;
+AddExp        ::= MulExp | AddExp ("+" | "-") MulExp;
+RelExp        ::= AddExp | RelExp ("<" | ">" | "<=" | ">=") AddExp;
+EqExp         ::= RelExp | EqExp ("==" | "!=") RelExp;
+LAndExp       ::= EqExp | LAndExp "&&" EqExp;
+LOrExp        ::= LAndExp | LOrExp "||" LAndExp;
+
+*)
+
+MulExp        ::= UnaryExp {("*" | "/" | "%") UnaryExp};
+AddExp        ::= MulExp {("+" | "-") MulExp};
+RelExp        ::= AddExp {("<" | ">" | "<=" | ">=") AddExp};
+EqExp         ::= RelExp {("==" | "!=") RelExp};
+LAndExp       ::= EqExp {"&&" EqExp};
+LOrExp        ::= LAndExp {"||" LAndExp};

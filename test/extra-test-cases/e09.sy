@@ -1,0 +1,12 @@
+int main()
+{
+  int a0 = 1;
+  int B[0x1000000];
+  int a1 = 2;
+  // int C[0x1000000];
+  int a2 = 3;
+  // int a3 = B[0x1000000 - 1];
+  // int a4 = B[0x1000000 - 3];
+  // // int a5 = C[0x1000000 - 4];
+  return 0;
+}

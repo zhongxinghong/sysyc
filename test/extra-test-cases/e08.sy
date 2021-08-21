@@ -1,0 +1,10 @@
+int A[0x1000000];
+
+int main()
+{
+  int B[0x1000000];
+
+  int a = A[0];
+  int b = B[0];
+  return 0;
+}

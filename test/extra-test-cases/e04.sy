@@ -1,0 +1,56 @@
+// test quad
+// https://blog.csdn.net/gui951753/article/details/47667821
+
+int map[32][32],inde[32],a[32],queue[32];
+int n;
+void topo(){
+	int i,j,k,t=-1;
+  i=1;
+	while(i<=n){
+    j=1;
+		while(j<=n){
+      if(!inde[j]){
+				k=j;
+				break;
+			}
+      j=j+1;
+    }
+    t=t+1;
+		queue[t]=k;
+		inde[k]=-1;
+    j=1;
+		while(j<=n){
+      if(map[k][j]){
+				inde[j]=inde[j]-1;
+			}
+      j=j+1;
+    }
+    i=i+1;
+	}
+  putint(queue[0]);
+  i=1;
+  while(i<n){
+    putint(queue[i]);
+		i=i+1;
+  }
+}
+int main(){
+  n=getint();
+
+  int i=1;
+  while(i<=n){
+    int k=0;
+    a[k]=getint();
+    while(a[k]){
+      if(!map[i][a[k]]){
+        map[i][a[k]]=1;
+        inde[a[k]]=inde[a[k]]+1;
+      }
+      k=k+1;
+      a[k]=getint();
+    }
+    i=i+1;
+  }
+  topo();
+	return 0;
+}

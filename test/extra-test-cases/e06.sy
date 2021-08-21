@@ -1,0 +1,34 @@
+// test local array init
+
+int e06_abs(int x)
+{
+  if (x < 0)
+    return -x;
+  return x;
+}
+
+int main()
+{
+  int A[2][6] = {{1, 2}, {0, 3, 4}};
+
+  // 1 2 0 0 0 0
+  // 0 3 4 0 0 0
+
+  int a00 = e06_abs(A[0][0] - 1);
+  int a01 = e06_abs(A[0][1] - 2);
+  int a02 = e06_abs(A[0][2] - 0);
+  int a03 = e06_abs(A[0][3] - 0);
+  int a04 = e06_abs(A[0][4] - 0);
+  int a05 = e06_abs(A[0][5] - 0);
+  int a10 = e06_abs(A[1][0] - 0);
+  int a11 = e06_abs(A[1][1] - 3);
+  int a12 = e06_abs(A[1][2] - 4);
+  int a13 = e06_abs(A[1][3] - 0);
+  int a14 = e06_abs(A[1][4] - 0);
+  int a15 = e06_abs(A[1][5] - 0);
+
+  int ans = a00 + a01 + a02 + a03 + a04 + a05 +
+            a10 + a11 + a12 + a13 + a14 + a15;
+
+  return ans;
+}

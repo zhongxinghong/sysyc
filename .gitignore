@@ -1,0 +1,20 @@
+.vscode/
+__pycache__/
+build/
+backup/
+test/output/
+*.log
+
+# only for handing in homework
+# test/
+# *.ebnf
+# CMakeLists.txt
+# README.md
+
+# dummy header to hint grader
+# __include_this_directory.h
+
+# submodules
+test/MiniVM/
+test/MiniVM-test/
+test/open-test-cases/

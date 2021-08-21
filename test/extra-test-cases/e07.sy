@@ -1,0 +1,34 @@
+// test long array
+
+int A[0x2000];
+
+void func2(int a[])
+{
+  a[0x1fff] = 0;
+  a[0x1eff] = 0;
+}
+
+void func1()
+{
+  int C[0x2000];
+  func2(C);
+}
+
+int main()
+{
+  int B[0x2000] = {1, 2};
+
+  int a1 = A[0x1fff];
+  int a2 = A[0x1eff];
+  int a3 = A[0x1dff];
+
+  int b1 = B[0x1fff];
+  int b2 = B[0x1eff];
+  int b3 = B[0x1dff];
+
+  func1();
+
+  int ans = a1 + a2 + a3 + b1 + b2 + b3;
+
+  return ans;
+}

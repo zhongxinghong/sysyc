@@ -1,0 +1,30 @@
+// test quad
+
+int e05_abs(int x)
+{
+  if (x < 0)
+    return -x;
+  return x;
+}
+
+int sum4(int a1, int a2, int a3, int a4)
+{
+  return a1 + a2 + a3 + a4;
+}
+
+int main()
+{
+  int x[4] = {1, 2, 3, 4};
+  int i, j, k = 4;
+
+  j = k + 2;
+  i = j + 5;
+  k = j + 1;
+  j = i + k;
+
+  int y = sum4(x[0] + 2, x[1] / 2, x[2] * 4 + 3, x[3] - 2);
+  int z = (1 + 2) + 2 / 2 + (3 * 4 + 3) + (4 - 2);
+  int ans = e05_abs(y - z);
+
+  return ans;
+}
